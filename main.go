@@ -12,5 +12,6 @@ func main() {
 		Handler: serverMux,
 	}
 
+	serverMux.Handle("/", http.FileServer(http.Dir("./")))
 	log.Fatal(server.ListenAndServe())
 }
