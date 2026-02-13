@@ -22,11 +22,11 @@ func main() {
 	cfg := apiConfig{fileServerHits: atomic.Int32{}}
 
 	serverMux.Handle(
-		"/app",
+		"/app/",
 		http.StripPrefix("/app", cfg.middlewareMetricsInc(handler)))
-	serverMux.HandleFunc("GET /healthz", hearthBeatHandler)
-	serverMux.HandleFunc("GET /metrics", cfg.fileServerHitsHandler)
-	serverMux.HandleFunc("POST /reset", cfg.resetHitsHandler)
+	serverMux.HandleFunc("GET /api/healthz", hearthBeatHandler)
+	serverMux.HandleFunc("GET /api/metrics", cfg.fileServerHitsHandler)
+	serverMux.HandleFunc("POST /api/reset", cfg.resetHitsHandler)
 	log.Fatal(server.ListenAndServe())
 }
 
