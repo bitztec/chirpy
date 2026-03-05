@@ -1,19 +1,35 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync/atomic"
+
+	"github.com/bitztec/chirpy/internal/database"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
 	fileServerHits atomic.Int32
+	dbQueries      *database.Queries
+	platform       string
 }
 
 func main() {
+	godotenv.Load()
+	dbURL := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	serverMux := http.NewServeMux()
 	server := &http.Server{
 		Addr:    ":8080",
@@ -21,7 +37,11 @@ func main() {
 	}
 
 	handler := http.FileServer(http.Dir("./"))
-	cfg := apiConfig{fileServerHits: atomic.Int32{}}
+	cfg := apiConfig{
+		fileServerHits: atomic.Int32{},
+		dbQueries:      database.New(db),
+		platform:       os.Getenv("PLATFORM"),
+	}
 
 	serverMux.Handle(
 		"/app/",
@@ -30,6 +50,7 @@ func main() {
 	serverMux.HandleFunc("POST /api/validate_chirp", validateChirpHandler)
 	serverMux.HandleFunc("GET /admin/metrics", cfg.metricsHandler)
 	serverMux.HandleFunc("POST /admin/reset", cfg.resetHandler)
+	serverMux.HandleFunc("POST /api/users", cfg.createUserHandler)
 	log.Fatal(server.ListenAndServe())
 }
 

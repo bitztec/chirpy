@@ -19,6 +19,12 @@ func (cfg *apiConfig) metricsHandler(writer http.ResponseWriter, request *http.R
 }
 
 func (cfg *apiConfig) resetHandler(writer http.ResponseWriter, request *http.Request) {
+	if cfg.platform != "dev" {
+		writer.WriteHeader(403)
+		return
+	}
+
+	cfg.dbQueries.DeleteAllUsers(request.Context())
 	cfg.fileServerHits.Store(0)
 	writer.Header().Add("Content-Type", "test/plain; charset=utf-8")
 	writer.WriteHeader(200)
