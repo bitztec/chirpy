@@ -1,0 +1,13 @@
+name: Create Chirp
+method: POST
+url: http://localhost:8080/api/chirps
+body:
+  content: |-
+    {
+      "body": "If you're committed enough, you can make any story work. new",
+      "user_id": "e051f16b-8a6e-47f2-b0f5-2ce69ad27439"
+    }
+  content_type: application/json
+headers:
+- name: content-type
+  value: application/json

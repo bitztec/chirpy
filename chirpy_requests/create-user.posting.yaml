@@ -1,0 +1,12 @@
+name: Create User
+method: POST
+url: http://localhost:8080/api/users
+body:
+  content: |-
+    {
+      "email": "canek@posting.com"
+    }
+  content_type: application/json
+headers:
+- name: content-type
+  value: application/json

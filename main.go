@@ -47,10 +47,11 @@ func main() {
 		"/app/",
 		http.StripPrefix("/app", cfg.middlewareMetricsIncrement(handler)))
 	serverMux.HandleFunc("GET /api/healthz", hearthBeatHandler)
-	serverMux.HandleFunc("POST /api/validate_chirp", validateChirpHandler)
 	serverMux.HandleFunc("GET /admin/metrics", cfg.metricsHandler)
 	serverMux.HandleFunc("POST /admin/reset", cfg.resetHandler)
+
 	serverMux.HandleFunc("POST /api/users", cfg.createUserHandler)
+	serverMux.HandleFunc("POST /api/chirps", cfg.createChirpHandler)
 	log.Fatal(server.ListenAndServe())
 }
 
