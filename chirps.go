@@ -51,6 +51,28 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, r *http.Request)
 	respondWithJson(201, w, dtoChirp)
 }
 
+func (cfg *apiConfig) getAllChirpsHandler(w http.ResponseWriter, r *http.Request) {
+	chirps, err := cfg.dbQueries.GetAllChirps(r.Context())
+	if err != nil {
+		respondWithError(500, "", w)
+		return
+	}
+
+	responseChirps := make([]DTOChirp, len(chirps))
+
+	for i, chirp := range chirps {
+		responseChirps[i] = DTOChirp{
+			ID:        chirp.ID,
+			CreatedAt: chirp.CreatedAt,
+			UpdatedAt: chirp.UpdatedAt,
+			Body:      chirp.Body,
+			UserID:    chirp.UserID,
+		}
+	}
+
+	respondWithJson(200, w, responseChirps)
+}
+
 func cleanResponse(body string) string {
 	parts := strings.Split(body, " ")
 	newParts := make([]string, len(parts))
