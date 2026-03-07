@@ -51,9 +51,10 @@ func main() {
 	serverMux.HandleFunc("POST /admin/reset", cfg.resetHandler)
 
 	serverMux.HandleFunc("POST /api/users", cfg.createUserHandler)
-	
+
 	serverMux.HandleFunc("POST /api/chirps", cfg.createChirpHandler)
 	serverMux.HandleFunc("GET /api/chirps", cfg.getAllChirpsHandler)
+	serverMux.HandleFunc("GET /api/chirps/{chirpID}", cfg.getChirpHandler)
 	log.Fatal(server.ListenAndServe())
 }
 

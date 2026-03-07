@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bitztec/chirpy/internal/database"
+	database "github.com/bitztec/chirpy/internal/database"
 	"github.com/google/uuid"
 )
 
@@ -73,6 +73,28 @@ func (cfg *apiConfig) getAllChirpsHandler(w http.ResponseWriter, r *http.Request
 	respondWithJson(200, w, responseChirps)
 }
 
+func (cfg *apiConfig) getChirpHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("chirpID")
+	if len(id) == 0 {
+		respondWithError(404, "Chirp not found", w)
+		return
+	}
+
+	dbID, err := uuid.Parse(id)
+	if err != nil {
+		respondWithError(404, "Chirp not found", w)
+		return
+	}
+
+	dbChirp, err := cfg.dbQueries.GetChirpById(r.Context(), dbID)
+	if err != nil {
+		respondWithError(404, "Chirp not found", w)
+		return
+	}
+
+	respondWithJson(200, w, toDTO(dbChirp))
+}
+
 func cleanResponse(body string) string {
 	parts := strings.Split(body, " ")
 	newParts := make([]string, len(parts))
@@ -89,4 +111,16 @@ func cleanResponse(body string) string {
 	}
 
 	return strings.Join(newParts, " ")
+}
+
+func toDTO (c database.Chirp) DTOChirp {
+	chirp := DTOChirp {
+		ID:        c.ID,
+		CreatedAt: c.CreatedAt,
+		UpdatedAt: c.UpdatedAt,
+		Body:      c.Body,
+		UserID:    c.UserID,
+	}
+
+	return chirp
 }
