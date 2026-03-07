@@ -27,14 +27,7 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	dtoUser := DTOUser{
-		ID:        user.ID,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-		Email:     user.Email,
-	}
-
-	responseBody, err := json.Marshal(dtoUser)
+	responseBody, err := json.Marshal(user.ToDTO())
 	if err != nil {
 		fmt.Printf("\nError marshalling JSON: %s", err)
 		return

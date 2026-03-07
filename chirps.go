@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	database "github.com/bitztec/chirpy/internal/database"
+	dto "github.com/bitztec/chirpy/internal/dataTransfer"
 	"github.com/google/uuid"
 )
 
@@ -40,15 +41,7 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	dtoChirp := DTOChirp{
-		ID:        dbChirp.ID,
-		CreatedAt: dbChirp.CreatedAt,
-		UpdatedAt: dbChirp.UpdatedAt,
-		Body:      dbChirp.Body,
-		UserID:    dbChirp.UserID,
-	}
-
-	respondWithJson(201, w, dtoChirp)
+	respondWithJson(201, w, dbChirp.ToDTO())
 }
 
 func (cfg *apiConfig) getAllChirpsHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,16 +51,10 @@ func (cfg *apiConfig) getAllChirpsHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	responseChirps := make([]DTOChirp, len(chirps))
+	responseChirps := make([]dto.DTOChirp, len(chirps))
 
 	for i, chirp := range chirps {
-		responseChirps[i] = DTOChirp{
-			ID:        chirp.ID,
-			CreatedAt: chirp.CreatedAt,
-			UpdatedAt: chirp.UpdatedAt,
-			Body:      chirp.Body,
-			UserID:    chirp.UserID,
-		}
+		responseChirps[i] = chirp.ToDTO()
 	}
 
 	respondWithJson(200, w, responseChirps)
@@ -92,7 +79,7 @@ func (cfg *apiConfig) getChirpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJson(200, w, toDTO(dbChirp))
+	respondWithJson(200, w, dbChirp.ToDTO())
 }
 
 func cleanResponse(body string) string {
@@ -111,16 +98,4 @@ func cleanResponse(body string) string {
 	}
 
 	return strings.Join(newParts, " ")
-}
-
-func toDTO (c database.Chirp) DTOChirp {
-	chirp := DTOChirp {
-		ID:        c.ID,
-		CreatedAt: c.CreatedAt,
-		UpdatedAt: c.UpdatedAt,
-		Body:      c.Body,
-		UserID:    c.UserID,
-	}
-
-	return chirp
 }
